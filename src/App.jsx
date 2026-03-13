@@ -71,14 +71,74 @@ const SUPPORT_NEEDS = ['情绪安慰', '实际建议', '帮我整理思路', '�
 
 const RESPONSE_STYLES = ['温柔一点', '更具体一点', '一步一步地帮我分析', '简洁直接', '更像陪我理清思路', '不要太空泛'];
 
+// --- 颜色系统 ---
+const COLORS = {
+  bgPrimary: '#F8F6F0',
+  bgSecondary: '#F7F3E8',
+  bgWarm: '#FAF4E0',
+
+  cardDefault: '#FFFFFF',
+  cardMuted: '#FAF4E0',
+
+  primary: '#C7E5C9',
+  primaryHover: '#B8DBBB',
+  primaryDisabled: '#E5E5E5',
+
+  helper: '#EDF1CF',
+  selectedBorder: '#C7E5C9',
+
+  textPrimary: '#4A4A4A',
+  textSecondary: '#666666',
+  textTertiary: '#8A8A8A',
+
+  border: '#E8E2D8',
+  divider: '#ECE7DE',
+};
+
+const CONCERN_COLORS = {
+  academic: {
+    main: '#F3E5C0',
+    soft: '#FAF4E0',
+    accent: '#D7B97A',
+  },
+  future: {
+    main: '#F8D6B8',
+    soft: '#FFCDBC',
+    accent: '#E0A77F',
+  },
+  family: {
+    main: '#F9E6E6',
+    soft: '#F9B7BE',
+    accent: '#D99AA2',
+  },
+  social: {
+    main: '#DECCE6',
+    soft: '#EADDF0',
+    accent: '#B79AC6',
+  },
+  culture: {
+    main: '#C7E5C9',
+    soft: '#EDF1CF',
+    accent: '#7FAF88',
+  },
+};
+
+const getConcernColor = (id) => CONCERN_COLORS[id] || CONCERN_COLORS.culture;
+
 // --- 子组件：进度条 ---
 const ProgressBar = ({ current, total }) => {
   const progress = (current / total) * 100;
   return (
-    <div className="w-full h-1 bg-[#E7ECE3] rounded-full overflow-hidden mb-8">
+    <div
+      className="w-full h-1 rounded-full overflow-hidden mb-8"
+      style={{ backgroundColor: COLORS.helper }}
+    >
       <div
-        className="h-full bg-[#A7C4A0] transition-all duration-500 ease-out"
-        style={{ width: `${progress}%` }}
+        className="h-full transition-all duration-500 ease-out"
+        style={{
+          width: `${progress}%`,
+          backgroundColor: COLORS.primary,
+        }}
       />
     </div>
   );
@@ -86,7 +146,7 @@ const ProgressBar = ({ current, total }) => {
 
 // --- 主应用 ---
 export default function App() {
-  const [step, setStep] = useState(0); // 0 to 7
+  const [step, setStep] = useState(0);
   const [selectedConcerns, setSelectedConcerns] = useState([]);
   const [concernData, setConcernData] = useState({});
   const [supportNeeds, setSupportNeeds] = useState([]);
@@ -99,6 +159,8 @@ export default function App() {
     concernStepIndex !== null
       ? CONCERNS_CONFIG.find((c) => c.id === selectedConcerns[concernStepIndex])
       : null;
+
+  const currentConcernTheme = currentConcern ? getConcernColor(currentConcern.id) : null;
 
   const handleNext = () => setStep((s) => s + 1);
   const handleBack = () => setStep((s) => s - 1);
@@ -210,28 +272,60 @@ export default function App() {
     document.body.removeChild(textArea);
   };
 
+  const pageBackground = () => {
+    if (step >= 2 && step <= 4) return COLORS.bgSecondary;
+    return COLORS.bgPrimary;
+  };
+
   // Screen 0: Scenario Entry
   const renderStep0 = () => (
     <div className="flex flex-col items-center text-center py-8">
-      <div className="w-16 h-16 bg-[#EDF1CF] rounded-2xl flex items-center justify-center mb-6 text-[#A7C4A0]">
+      <div
+        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+        style={{ backgroundColor: COLORS.helper, color: COLORS.textPrimary }}
+      >
         <MessageCircle size={32} />
       </div>
-      <h1 className="text-2xl font-bold text-[#4A4A4A] mb-4">我们先一起理清你现在想说的内容</h1>
-      <p className="text-[#666666] mb-8 max-w-md">你不需要一次把所有事情都说清楚。我们会一步一步帮你整理。</p>
-      <div className="bg-[#FAF4E0] p-6 rounded-2xl text-left border border-[#E8DDC2] mb-10 leading-relaxed">
-        <p className="text-[#666666] text-sm">
+
+      <h1 className="text-2xl font-bold mb-4" style={{ color: COLORS.textPrimary }}>
+        我们先一起理清你现在想说的内容
+      </h1>
+
+      <p className="mb-8 max-w-md" style={{ color: COLORS.textSecondary }}>
+        你不需要一次把所有事情都说清楚。我们会一步一步帮你整理。
+      </p>
+
+      <div
+        className="p-6 rounded-2xl text-left mb-10 leading-relaxed border"
+        style={{
+          backgroundColor: COLORS.bgWarm,
+          borderColor: COLORS.border,
+        }}
+      >
+        <p className="text-sm" style={{ color: COLORS.textSecondary }}>
           建议使用场景：
           <br />
           假设你现在是一名在英国留学的中国学生。最近你正处于一个压力比较大的阶段，生活中可能有几件事情同时影响着你的状态。你想向 AI 寻求一些支持，但在真正开口之前，你需要先理清楚自己想说什么。
         </p>
       </div>
+
       <button
         onClick={handleNext}
-        className="bg-[#A7C4A0] hover:bg-[#96B58F] text-white px-10 py-4 rounded-full font-medium transition-all shadow-lg shadow-[#D9E2D4] flex items-center gap-2 group"
+        className="px-10 py-4 rounded-full font-medium transition-all shadow-lg flex items-center gap-2 group"
+        style={{
+          backgroundColor: COLORS.primary,
+          color: COLORS.textPrimary,
+          boxShadow: '0 10px 26px rgba(199, 229, 201, 0.45)',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = COLORS.primaryHover)}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = COLORS.primary)}
       >
         开始整理 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
       </button>
-      <p className="mt-6 text-xs text-[#8A8A8A]">整个过程大约需要 3–5 分钟</p>
+
+      <p className="mt-6 text-xs" style={{ color: COLORS.textTertiary }}>
+        整个过程大约需要 3–5 分钟
+      </p>
     </div>
   );
 
@@ -239,32 +333,54 @@ export default function App() {
   const renderStep1 = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#4A4A4A] mb-2">现在最压在你心上的三件事是什么？</h2>
-        <p className="text-[#666666]">请选择 3 个你现在最想倾诉、最想整理的问题。</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>
+          现在最压在你心上的三件事是什么？
+        </h2>
+        <p style={{ color: COLORS.textSecondary }}>
+          请选择 3 个你现在最想倾诉、最想整理的问题。
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 mb-8">
         {CONCERNS_CONFIG.map((item) => {
           const isSelected = selectedConcerns.includes(item.id);
+          const theme = getConcernColor(item.id);
+
           return (
             <div
               key={item.id}
               onClick={() => toggleConcern(item.id)}
-              className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-4 ${
-                isSelected
-                  ? 'border-[#A7C4A0] bg-[#D0DEBD] ring-4 ring-[#EDF1CF]'
-                  : 'border-[#D9E2D4] bg-white hover:border-[#A7C4A0]'
-              }`}
+              className="relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-4"
+              style={{
+                backgroundColor: isSelected ? theme.main : COLORS.cardMuted,
+                borderColor: isSelected ? theme.accent : 'transparent',
+                boxShadow: isSelected ? '0 8px 24px rgba(0,0,0,0.04)' : 'none',
+              }}
             >
-              <div className={`p-3 rounded-xl ${isSelected ? 'bg-[#A7C4A0] text-white' : 'bg-[#F3F5EF] text-[#8A8A8A]'}`}>
+              <div
+                className="p-3 rounded-xl"
+                style={{
+                  backgroundColor: isSelected ? theme.soft : COLORS.bgPrimary,
+                  color: COLORS.textPrimary,
+                }}
+              >
                 {item.icon}
               </div>
+
               <div className="flex-1">
-                <h3 className="font-bold text-[#4A4A4A]">{item.title}</h3>
-                <p className="text-sm text-[#666666] mt-1">{item.desc}</p>
+                <h3 className="font-bold" style={{ color: COLORS.textPrimary }}>
+                  {item.title}
+                </h3>
+                <p className="text-sm mt-1" style={{ color: COLORS.textSecondary }}>
+                  {item.desc}
+                </p>
               </div>
+
               {isSelected && (
-                <div className="absolute right-4 top-4 bg-[#A7C4A0] rounded-full p-1 text-white">
+                <div
+                  className="absolute right-4 top-4 rounded-full p-1"
+                  style={{ backgroundColor: theme.accent, color: COLORS.textPrimary }}
+                >
                   <Check size={14} />
                 </div>
               )}
@@ -273,20 +389,26 @@ export default function App() {
         })}
       </div>
 
-      <div className="flex items-center justify-between mt-auto pt-6 border-t border-[#E7ECE3]">
-        <span className="text-sm font-medium text-[#6B7F6B]">已选择 {selectedConcerns.length} / 3</span>
+      <div className="flex items-center justify-between mt-auto pt-6 border-t" style={{ borderColor: COLORS.divider }}>
+        <span className="text-sm font-medium" style={{ color: COLORS.textPrimary }}>
+          已选择 {selectedConcerns.length} / 3
+        </span>
+
         <div className="flex gap-3">
-          <button onClick={handleBack} className="px-6 py-3 text-[#666666] font-medium">
+          <button onClick={handleBack} className="px-6 py-3 font-medium" style={{ color: COLORS.textSecondary }}>
             返回
           </button>
+
           <button
             disabled={selectedConcerns.length !== 3}
             onClick={handleNext}
-            className={`px-8 py-3 rounded-full font-medium transition-all ${
-              selectedConcerns.length === 3
-                ? 'bg-[#A7C4A0] text-white shadow-lg shadow-[#D9E2D4]'
-                : 'bg-[#E7ECE3] text-[#A0A0A0] cursor-not-allowed'
-            }`}
+            className="px-8 py-3 rounded-full font-medium transition-all"
+            style={{
+              backgroundColor: selectedConcerns.length === 3 ? COLORS.primary : COLORS.primaryDisabled,
+              color: selectedConcerns.length === 3 ? COLORS.textPrimary : COLORS.textTertiary,
+              boxShadow: selectedConcerns.length === 3 ? '0 10px 26px rgba(199, 229, 201, 0.45)' : 'none',
+              cursor: selectedConcerns.length === 3 ? 'pointer' : 'not-allowed',
+            }}
           >
             继续
           </button>
@@ -308,6 +430,8 @@ export default function App() {
       customImpact: '',
     };
 
+    const theme = getConcernColor(currentConcern.id);
+
     const toggleTag = (field, tag) => {
       const currentTags = data[field];
       if (currentTags.includes(tag)) {
@@ -317,30 +441,45 @@ export default function App() {
       }
     };
 
-    const inputClass =
-      'w-full px-4 py-3 rounded-xl border border-[#D9E2D4] bg-white text-sm text-[#4A4A4A] outline-none focus:border-[#A7C4A0] placeholder:text-[#8A8A8A]';
+    const inputClass = 'w-full px-4 py-3 rounded-xl border bg-white text-sm outline-none';
+
+    const chipStyle = (selected) => ({
+      backgroundColor: selected ? COLORS.helper : COLORS.cardDefault,
+      color: COLORS.textPrimary,
+      borderColor: selected ? COLORS.primary : COLORS.border,
+      boxShadow: selected ? '0 4px 14px rgba(199, 229, 201, 0.25)' : 'none',
+    });
 
     return (
       <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-[#4A4A4A] mb-2">关于「{currentConcern.title}」</h2>
-          <p className="text-[#666666]">请从下面的内容中选出最符合你现在状态的部分。</p>
+        <div
+          className="mb-8 rounded-3xl p-6 border"
+          style={{
+            backgroundColor: theme.main,
+            borderColor: theme.accent,
+          }}
+        >
+          <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>
+            关于「{currentConcern.title}」
+          </h2>
+          <p style={{ color: COLORS.textSecondary }}>
+            请从下面的内容中选出最符合你现在状态的部分。
+          </p>
         </div>
 
         <div className="space-y-10">
           {/* Section A */}
           <section>
-            <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4">A. 这件事现在主要是什么情况？</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.textPrimary }}>
+              A. 这件事现在主要是什么情况？
+            </h3>
             <div className="flex flex-wrap gap-3">
               {currentConcern.cues.map((cue) => (
                 <button
                   key={cue}
                   onClick={() => toggleTag('cues', cue)}
-                  className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                    data.cues.includes(cue)
-                      ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0] shadow-md'
-                      : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                  }`}
+                  className="px-4 py-2 rounded-xl text-sm transition-all border"
+                  style={chipStyle(data.cues.includes(cue))}
                 >
                   {cue}
                 </button>
@@ -354,11 +493,8 @@ export default function App() {
                     updateConcernData(currentConcern.id, 'customCue', ' ');
                   }
                 }}
-                className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                  data.customCue !== ''
-                    ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0]'
-                    : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm transition-all border"
+                style={chipStyle(data.customCue !== '')}
               >
                 其他
               </button>
@@ -372,6 +508,10 @@ export default function App() {
                   onChange={(e) => updateConcernData(currentConcern.id, 'customCue', e.target.value)}
                   placeholder="用一句话补充这件事里对你最重要、但选项里没有的内容"
                   className={inputClass}
+                  style={{
+                    borderColor: COLORS.border,
+                    color: COLORS.textPrimary,
+                  }}
                 />
               </div>
             )}
@@ -379,17 +519,16 @@ export default function App() {
 
           {/* Section B */}
           <section>
-            <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4">B. 这件事让你有什么感受？</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.textPrimary }}>
+              B. 这件事让你有什么感受？
+            </h3>
             <div className="flex flex-wrap gap-3">
               {EMOTIONS.map((emo) => (
                 <button
                   key={emo}
                   onClick={() => toggleTag('emotions', emo)}
-                  className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                    data.emotions.includes(emo)
-                      ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0] shadow-md'
-                      : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                  }`}
+                  className="px-4 py-2 rounded-xl text-sm transition-all border"
+                  style={chipStyle(data.emotions.includes(emo))}
                 >
                   {emo}
                 </button>
@@ -403,11 +542,8 @@ export default function App() {
                     updateConcernData(currentConcern.id, 'customEmotion', ' ');
                   }
                 }}
-                className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                  data.customEmotion !== ''
-                    ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0]'
-                    : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm transition-all border"
+                style={chipStyle(data.customEmotion !== '')}
               >
                 其他
               </button>
@@ -421,6 +557,10 @@ export default function App() {
                   onChange={(e) => updateConcernData(currentConcern.id, 'customEmotion', e.target.value)}
                   placeholder="你还可以补充一个更贴近你状态的感受词"
                   className={inputClass}
+                  style={{
+                    borderColor: COLORS.border,
+                    color: COLORS.textPrimary,
+                  }}
                 />
               </div>
             )}
@@ -428,17 +568,16 @@ export default function App() {
 
           {/* Section C */}
           <section>
-            <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4">C. 它现在最明显地影响了你什么？</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.textPrimary }}>
+              C. 它现在最明显地影响了你什么？
+            </h3>
             <div className="flex flex-wrap gap-3">
               {IMPACTS.map((impact) => (
                 <button
                   key={impact}
                   onClick={() => toggleTag('impacts', impact)}
-                  className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                    data.impacts.includes(impact)
-                      ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0] shadow-md'
-                      : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                  }`}
+                  className="px-4 py-2 rounded-xl text-sm transition-all border"
+                  style={chipStyle(data.impacts.includes(impact))}
                 >
                   {impact}
                 </button>
@@ -452,11 +591,8 @@ export default function App() {
                     updateConcernData(currentConcern.id, 'customImpact', ' ');
                   }
                 }}
-                className={`px-4 py-2 rounded-xl text-sm transition-all border ${
-                  data.customImpact !== ''
-                    ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0]'
-                    : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm transition-all border"
+                style={chipStyle(data.customImpact !== '')}
               >
                 其他
               </button>
@@ -470,24 +606,31 @@ export default function App() {
                   onChange={(e) => updateConcernData(currentConcern.id, 'customImpact', e.target.value)}
                   placeholder="补充这件事现在最明显带来的影响"
                   className={inputClass}
+                  style={{
+                    borderColor: COLORS.border,
+                    color: COLORS.textPrimary,
+                  }}
                 />
               </div>
             )}
           </section>
         </div>
 
-        <div className="flex items-center justify-end mt-12 pt-6 border-t border-[#E7ECE3] gap-3">
-          <button onClick={handleBack} className="px-6 py-3 text-[#666666] font-medium">
+        <div className="flex items-center justify-end mt-12 pt-6 border-t gap-3" style={{ borderColor: COLORS.divider }}>
+          <button onClick={handleBack} className="px-6 py-3 font-medium" style={{ color: COLORS.textSecondary }}>
             上一步
           </button>
+
           <button
             disabled={!isConcernComplete(currentConcern.id)}
             onClick={handleNext}
-            className={`px-8 py-3 rounded-full font-medium transition-all ${
-              isConcernComplete(currentConcern.id)
-                ? 'bg-[#A7C4A0] text-white shadow-lg'
-                : 'bg-[#E7ECE3] text-[#A0A0A0] cursor-not-allowed'
-            }`}
+            className="px-8 py-3 rounded-full font-medium transition-all"
+            style={{
+              backgroundColor: isConcernComplete(currentConcern.id) ? COLORS.primary : COLORS.primaryDisabled,
+              color: isConcernComplete(currentConcern.id) ? COLORS.textPrimary : COLORS.textTertiary,
+              boxShadow: isConcernComplete(currentConcern.id) ? '0 10px 26px rgba(199, 229, 201, 0.45)' : 'none',
+              cursor: isConcernComplete(currentConcern.id) ? 'pointer' : 'not-allowed',
+            }}
           >
             下一步
           </button>
@@ -500,13 +643,23 @@ export default function App() {
   const renderSupportNeeds = () => (
     <div className="animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#4A4A4A] mb-2">你现在最希望得到什么样的回应？</h2>
-        <p className="text-[#666666]">可以选 1–2 项最符合你当前需要的。</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>
+          你现在最希望得到什么样的回应？
+        </h2>
+        <p style={{ color: COLORS.textSecondary }}>可以选 1–2 项最符合你当前需要的。</p>
       </div>
 
       <div className="space-y-10">
-        <section className="bg-[#FAF4E0] rounded-2xl p-5 border border-[#E8DDC2]">
-          <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4">你希望得到什么支持？</h3>
+        <section
+          className="rounded-2xl p-5 border"
+          style={{
+            backgroundColor: COLORS.bgWarm,
+            borderColor: COLORS.border,
+          }}
+        >
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.textPrimary }}>
+            你希望得到什么支持？
+          </h3>
           <div className="grid grid-cols-2 gap-3">
             {SUPPORT_NEEDS.map((item) => (
               <button
@@ -518,11 +671,12 @@ export default function App() {
                     setSupportNeeds([...supportNeeds, item]);
                   }
                 }}
-                className={`p-4 rounded-xl text-left text-sm transition-all border flex justify-between items-center ${
-                  supportNeeds.includes(item)
-                    ? 'bg-[#D0DEBD] text-[#4A4A4A] border-[#A7C4A0]'
-                    : 'bg-white text-[#5A5A5A] border-[#D9E2D4]'
-                }`}
+                className="p-4 rounded-xl text-left text-sm transition-all border flex justify-between items-center"
+                style={{
+                  backgroundColor: supportNeeds.includes(item) ? COLORS.helper : COLORS.cardDefault,
+                  color: COLORS.textPrimary,
+                  borderColor: supportNeeds.includes(item) ? COLORS.primary : COLORS.border,
+                }}
               >
                 {item}
                 {supportNeeds.includes(item) && <Check size={14} />}
@@ -531,18 +685,27 @@ export default function App() {
           </div>
         </section>
 
-        <section className="bg-[#EDF1CF] rounded-2xl p-5 border border-[#D9E2D4]">
-          <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4">你希望 AI 用什么方式回应你？</h3>
+        <section
+          className="rounded-2xl p-5 border"
+          style={{
+            backgroundColor: COLORS.bgSecondary,
+            borderColor: COLORS.border,
+          }}
+        >
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.textPrimary }}>
+            你希望 AI 用什么方式回应你？
+          </h3>
           <div className="flex flex-wrap gap-3">
             {RESPONSE_STYLES.map((item) => (
               <button
                 key={item}
                 onClick={() => setResponseStyle(item)}
-                className={`px-4 py-3 rounded-xl text-sm transition-all border ${
-                  responseStyle === item
-                    ? 'bg-[#EDF1CF] text-[#4A4A4A] border-[#A7C4A0]'
-                    : 'bg-white text-[#5A5A5A] border-[#D9E2D4] hover:border-[#A7C4A0]'
-                }`}
+                className="px-4 py-3 rounded-xl text-sm transition-all border"
+                style={{
+                  backgroundColor: responseStyle === item ? COLORS.helper : COLORS.cardDefault,
+                  color: COLORS.textPrimary,
+                  borderColor: responseStyle === item ? COLORS.primary : COLORS.border,
+                }}
               >
                 {item}
               </button>
@@ -551,18 +714,21 @@ export default function App() {
         </section>
       </div>
 
-      <div className="flex items-center justify-end mt-12 pt-6 border-t border-[#E7ECE3] gap-3">
-        <button onClick={handleBack} className="px-6 py-3 text-[#666666] font-medium">
+      <div className="flex items-center justify-end mt-12 pt-6 border-t gap-3" style={{ borderColor: COLORS.divider }}>
+        <button onClick={handleBack} className="px-6 py-3 font-medium" style={{ color: COLORS.textSecondary }}>
           上一步
         </button>
+
         <button
           disabled={supportNeeds.length === 0 || !responseStyle}
           onClick={handleNext}
-          className={`px-8 py-3 rounded-full font-medium transition-all ${
-            supportNeeds.length > 0 && responseStyle
-              ? 'bg-[#A7C4A0] text-white shadow-lg'
-              : 'bg-[#E7ECE3] text-[#A0A0A0] cursor-not-allowed'
-          }`}
+          className="px-8 py-3 rounded-full font-medium transition-all"
+          style={{
+            backgroundColor: supportNeeds.length > 0 && responseStyle ? COLORS.primary : COLORS.primaryDisabled,
+            color: supportNeeds.length > 0 && responseStyle ? COLORS.textPrimary : COLORS.textTertiary,
+            boxShadow: supportNeeds.length > 0 && responseStyle ? '0 10px 26px rgba(199, 229, 201, 0.45)' : 'none',
+            cursor: supportNeeds.length > 0 && responseStyle ? 'pointer' : 'not-allowed',
+          }}
         >
           继续
         </button>
@@ -574,28 +740,61 @@ export default function App() {
   const renderOptional = () => (
     <div className="animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#4A4A4A] mb-2">还有什么你想补充的吗？</h2>
-        <p className="text-[#666666]">这一步是可选的。如果前面已经足够表达，也可以直接继续。</p>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>
+          还有什么你想补充的吗？
+        </h2>
+        <p style={{ color: COLORS.textSecondary }}>这一步是可选的。如果前面已经足够表达，也可以直接继续。</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#D9E2D4] p-6 shadow-sm">
+      <div
+        className="rounded-2xl p-6 shadow-sm border"
+        style={{
+          backgroundColor: COLORS.cardDefault,
+          borderColor: COLORS.border,
+        }}
+      >
+        <div
+          className="rounded-2xl p-4 border mb-3"
+          style={{
+            backgroundColor: COLORS.bgWarm,
+            borderColor: COLORS.border,
+          }}
+        >
+          <p className="text-sm" style={{ color: COLORS.textSecondary }}>
+            这里可以写下任何你觉得重要、但前面还没有表达出来的内容。
+          </p>
+        </div>
+
         <textarea
           rows={6}
           value={optionalText}
           onChange={(e) => setOptionalText(e.target.value)}
           placeholder="写下任何你觉得重要、但前面还没有表达出来的内容。"
-          className="w-full text-[#4A4A4A] outline-none resize-none placeholder:text-[#8A8A8A]"
+          className="w-full outline-none resize-none bg-transparent"
+          style={{ color: COLORS.textPrimary }}
         />
+
         <div className="mt-4 flex justify-end">
-          <span className="text-xs text-[#8A8A8A]">一句到几句即可</span>
+          <span className="text-xs" style={{ color: COLORS.textTertiary }}>
+            一句到几句即可
+          </span>
         </div>
       </div>
 
-      <div className="flex items-center justify-end mt-12 pt-6 border-t border-[#E7ECE3] gap-3">
-        <button onClick={handleBack} className="px-6 py-3 text-[#666666] font-medium">
+      <div className="flex items-center justify-end mt-12 pt-6 border-t gap-3" style={{ borderColor: COLORS.divider }}>
+        <button onClick={handleBack} className="px-6 py-3 font-medium" style={{ color: COLORS.textSecondary }}>
           上一步
         </button>
-        <button onClick={handleNext} className="px-8 py-3 bg-[#A7C4A0] text-white rounded-full font-medium shadow-lg">
+
+        <button
+          onClick={handleNext}
+          className="px-8 py-3 rounded-full font-medium transition-all"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.textPrimary,
+            boxShadow: '0 10px 26px rgba(199, 229, 201, 0.45)',
+          }}
+        >
           {optionalText.trim() ? '继续' : '跳过并完成'}
         </button>
       </div>
@@ -621,51 +820,127 @@ export default function App() {
     return (
       <div className="animate-in fade-in zoom-in-95 duration-700">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-[#4A4A4A] mb-2">为你生成的整理草稿</h2>
-          <p className="text-[#666666]">系统已经根据你的选择，梳理出了这段表达。你可以直接复制给 AI。</p>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: COLORS.textPrimary }}>
+            为你生成的整理草稿
+          </h2>
+          <p style={{ color: COLORS.textSecondary }}>
+            系统已经根据你的选择，梳理出了这段表达。你可以直接复制给 AI。
+          </p>
         </div>
 
         <div className="space-y-6">
           {/* Summary Card */}
-          <div className="bg-[#EDF1CF] rounded-2xl p-6 border border-[#D9E2D4]">
-            <h3 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-widest mb-4 flex items-center gap-2">
+          <div
+            className="rounded-2xl p-6 border"
+            style={{
+              backgroundColor: COLORS.bgWarm,
+              borderColor: COLORS.border,
+            }}
+          >
+            <h3 className="text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: COLORS.textPrimary }}>
               <Layout size={16} /> 你目前整理出的重点
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-xs text-[#6B7F6B] font-bold mb-2 uppercase">整体状态</p>
+                <p className="text-xs font-bold mb-2 uppercase" style={{ color: COLORS.textSecondary }}>
+                  整体状态
+                </p>
                 <div className="flex flex-wrap gap-1">
                   {overallEmotions.map((e) => (
-                    <span key={e} className="px-2 py-0.5 bg-white text-[#4A4A4A] text-xs rounded-lg border border-[#D9E2D4]">
+                    <span
+                      key={e}
+                      className="px-2 py-0.5 text-xs rounded-lg border"
+                      style={{
+                        backgroundColor: COLORS.cardDefault,
+                        color: COLORS.textPrimary,
+                        borderColor: COLORS.border,
+                      }}
+                    >
                       {e}
                     </span>
                   ))}
                 </div>
               </div>
+
               <div>
-                <p className="text-xs text-[#6B7F6B] font-bold mb-2 uppercase">核心关注</p>
-                <p className="text-sm text-[#4A4A4A] leading-relaxed">
-                  {selectedConcerns.map((id) => CONCERNS_CONFIG.find((c) => c.id === id).title).join('、')}
+                <p className="text-xs font-bold mb-2 uppercase" style={{ color: COLORS.textSecondary }}>
+                  核心关注
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedConcerns.map((id) => {
+                    const concern = CONCERNS_CONFIG.find((c) => c.id === id);
+                    const theme = getConcernColor(id);
+                    return (
+                      <span
+                        key={id}
+                        className="px-3 py-1 text-xs rounded-full border"
+                        style={{
+                          backgroundColor: theme.main,
+                          borderColor: theme.accent,
+                          color: COLORS.textPrimary,
+                        }}
+                      >
+                        {concern.title}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold mb-2 uppercase" style={{ color: COLORS.textSecondary }}>
+                  需要支持
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: COLORS.textPrimary }}>
+                  {supportNeeds.join('、')}
                 </p>
               </div>
+
               <div>
-                <p className="text-xs text-[#6B7F6B] font-bold mb-2 uppercase">需要支持</p>
-                <p className="text-sm text-[#4A4A4A] leading-relaxed">{supportNeeds.join('、')}</p>
-              </div>
-              <div>
-                <p className="text-xs text-[#6B7F6B] font-bold mb-2 uppercase">偏好风格</p>
-                <p className="text-sm text-[#4A4A4A] leading-relaxed">{responseStyle}</p>
+                <p className="text-xs font-bold mb-2 uppercase" style={{ color: COLORS.textSecondary }}>
+                  偏好风格
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: COLORS.textPrimary }}>
+                  {responseStyle}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Prompt Area */}
-          <div className="relative bg-white rounded-2xl border-2 border-[#D9E2D4] overflow-hidden group">
-            <div className="bg-[#F3F5EF] px-6 py-3 border-b border-[#D9E2D4] flex justify-between items-center">
-              <span className="text-xs font-bold text-[#4A4A4A] uppercase">AI 表达草稿</span>
+          <div
+            className="relative rounded-2xl border-2 overflow-hidden group"
+            style={{
+              backgroundColor: COLORS.bgSecondary,
+              borderColor: COLORS.border,
+            }}
+          >
+            <div
+              className="px-6 py-3 border-b flex justify-between items-center"
+              style={{
+                backgroundColor: COLORS.bgWarm,
+                borderColor: COLORS.border,
+              }}
+            >
+              <span className="text-xs font-bold uppercase" style={{ color: COLORS.textPrimary }}>
+                AI 表达草稿
+              </span>
+
               <button
                 onClick={copyToClipboard}
-                className="text-xs flex items-center gap-1 text-[#4A4A4A] font-bold bg-white px-3 py-1 rounded-full shadow-sm border border-[#D9E2D4] hover:bg-[#A7C4A0] hover:text-white transition-all active:scale-95"
+                className="text-xs flex items-center gap-1 font-bold px-3 py-1 rounded-full shadow-sm border transition-all active:scale-95"
+                style={{
+                  backgroundColor: COLORS.cardDefault,
+                  color: COLORS.textPrimary,
+                  borderColor: COLORS.border,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = COLORS.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = COLORS.cardDefault;
+                }}
               >
                 {showCopyFeedback ? (
                   <>
@@ -678,22 +953,43 @@ export default function App() {
                 )}
               </button>
             </div>
-            <div className="p-6 text-sm text-[#4A4A4A] leading-relaxed whitespace-pre-wrap font-serif">{prompt}</div>
+
+            <div className="p-6 text-sm leading-relaxed whitespace-pre-wrap font-serif" style={{ color: COLORS.textPrimary }}>
+              {prompt}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-12 pt-6 border-t border-[#E7ECE3]">
-          <button onClick={handleBack} className="px-6 py-3 text-[#8A8A8A] font-medium hover:text-[#4A4A4A] transition-colors">
+        <div className="flex items-center justify-between mt-12 pt-6 border-t" style={{ borderColor: COLORS.divider }}>
+          <button
+            onClick={handleBack}
+            className="px-6 py-3 font-medium transition-colors"
+            style={{ color: COLORS.textTertiary }}
+          >
             返回修改
           </button>
+
           <div className="flex gap-4">
             <button
               onClick={() => window.location.reload()}
-              className="px-8 py-3 border border-[#D9E2D4] bg-white text-[#666666] rounded-full font-medium hover:bg-[#F3F5EF]"
+              className="px-8 py-3 border rounded-full font-medium transition-all"
+              style={{
+                backgroundColor: COLORS.cardDefault,
+                borderColor: COLORS.border,
+                color: COLORS.textSecondary,
+              }}
             >
               重新整理
             </button>
-            <button className="px-8 py-3 bg-[#A7C4A0] text-white rounded-full font-medium shadow-lg hover:bg-[#96B58F] transition-all flex items-center gap-2">
+
+            <button
+              className="px-8 py-3 rounded-full font-medium shadow-lg transition-all flex items-center gap-2"
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.textPrimary,
+                boxShadow: '0 10px 26px rgba(199, 229, 201, 0.45)',
+              }}
+            >
               确认使用这段草稿 <Check size={18} />
             </button>
           </div>
@@ -703,19 +999,37 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F2] text-[#4A4A4A] font-sans selection:bg-[#D0DEBD]">
+    <div
+      className="min-h-screen font-sans"
+      style={{
+        backgroundColor: pageBackground(),
+        color: COLORS.textPrimary,
+      }}
+    >
       <div className="max-w-2xl mx-auto px-6 py-12 flex flex-col min-h-screen">
         {/* Header / Branding */}
         <header className="flex justify-between items-center mb-10">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#A7C4A0] rounded-lg flex items-center justify-center text-white">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: COLORS.primary, color: COLORS.textPrimary }}
+            >
               <Heart size={18} fill="currentColor" />
             </div>
-            <span className="font-bold text-[#4A4A4A] tracking-tight">Cue-to-Prompt</span>
+            <span className="font-bold tracking-tight" style={{ color: COLORS.textPrimary }}>
+              Cue-to-Prompt
+            </span>
           </div>
 
           {step > 0 && step < 7 && (
-            <div className="text-xs font-bold text-[#6B7F6B] uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-[#D9E2D4]">
+            <div
+              className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border"
+              style={{
+                color: COLORS.textSecondary,
+                backgroundColor: COLORS.cardDefault,
+                borderColor: COLORS.border,
+              }}
+            >
               步骤 {step} / 6
             </div>
           )}
@@ -736,7 +1050,9 @@ export default function App() {
 
         {/* Footer */}
         <footer className="mt-12 text-center py-6">
-          <p className="text-xs text-[#8A8A8A]">Cue-to-Prompt Prototype v1.0 • 轻量情绪支持引导</p>
+          <p className="text-xs" style={{ color: COLORS.textTertiary }}>
+            Cue-to-Prompt Prototype v1.0 • 轻量情绪支持引导
+          </p>
         </footer>
       </div>
     </div>
