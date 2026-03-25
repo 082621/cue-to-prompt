@@ -184,6 +184,9 @@ export default function App() {
           customCue: '',
           customEmotion: '',
           customImpact: '',
+          showCustomCue: false,
+          showCustomEmotion: false,
+          showCustomImpact: false,
         }),
         [field]: value,
       },
@@ -428,6 +431,9 @@ export default function App() {
       customCue: '',
       customEmotion: '',
       customImpact: '',
+      showCustomCue: false,
+      showCustomEmotion: false,
+      showCustomImpact: false,
     };
 
     const theme = getConcernColor(currentConcern.id);
@@ -487,24 +493,25 @@ export default function App() {
 
               <button
                 onClick={() => {
-                  if (data.customCue !== '') {
+                  const nextShow = !data.showCustomCue;
+                  updateConcernData(currentConcern.id, 'showCustomCue', nextShow);
+                  if (!nextShow) {
                     updateConcernData(currentConcern.id, 'customCue', '');
-                  } else {
-                    updateConcernData(currentConcern.id, 'customCue', ' ');
                   }
                 }}
                 className="px-4 py-2 rounded-xl text-sm transition-all border"
-                style={chipStyle(data.customCue !== '')}
+                style={chipStyle(data.showCustomCue)}
               >
                 其他
               </button>
             </div>
 
-            {data.customCue !== '' && (
+            {data.showCustomCue && (
               <div className="mt-4">
                 <input
                   type="text"
-                  value={data.customCue.trimStart()}
+                  autoFocus
+                  value={data.customCue}
                   onChange={(e) => updateConcernData(currentConcern.id, 'customCue', e.target.value)}
                   placeholder="用一句话补充这件事里对你最重要、但选项里没有的内容"
                   className={inputClass}
@@ -536,24 +543,25 @@ export default function App() {
 
               <button
                 onClick={() => {
-                  if (data.customEmotion !== '') {
+                  const nextShow = !data.showCustomEmotion;
+                  updateConcernData(currentConcern.id, 'showCustomEmotion', nextShow);
+                  if (!nextShow) {
                     updateConcernData(currentConcern.id, 'customEmotion', '');
-                  } else {
-                    updateConcernData(currentConcern.id, 'customEmotion', ' ');
                   }
                 }}
                 className="px-4 py-2 rounded-xl text-sm transition-all border"
-                style={chipStyle(data.customEmotion !== '')}
+                style={chipStyle(data.showCustomEmotion)}
               >
                 其他
               </button>
             </div>
 
-            {data.customEmotion !== '' && (
+            {data.showCustomEmotion && (
               <div className="mt-4">
                 <input
                   type="text"
-                  value={data.customEmotion.trimStart()}
+                  autoFocus
+                  value={data.customEmotion}
                   onChange={(e) => updateConcernData(currentConcern.id, 'customEmotion', e.target.value)}
                   placeholder="你还可以补充一个更贴近你状态的感受词"
                   className={inputClass}
@@ -585,24 +593,25 @@ export default function App() {
 
               <button
                 onClick={() => {
-                  if (data.customImpact !== '') {
+                  const nextShow = !data.showCustomImpact;
+                  updateConcernData(currentConcern.id, 'showCustomImpact', nextShow);
+                  if (!nextShow) {
                     updateConcernData(currentConcern.id, 'customImpact', '');
-                  } else {
-                    updateConcernData(currentConcern.id, 'customImpact', ' ');
                   }
                 }}
                 className="px-4 py-2 rounded-xl text-sm transition-all border"
-                style={chipStyle(data.customImpact !== '')}
+                style={chipStyle(data.showCustomImpact)}
               >
                 其他
               </button>
             </div>
 
-            {data.customImpact !== '' && (
+            {data.showCustomImpact && (
               <div className="mt-4">
                 <input
                   type="text"
-                  value={data.customImpact.trimStart()}
+                  autoFocus
+                  value={data.customImpact}
                   onChange={(e) => updateConcernData(currentConcern.id, 'customImpact', e.target.value)}
                   placeholder="补充这件事现在最明显带来的影响"
                   className={inputClass}
