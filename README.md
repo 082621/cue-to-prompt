@@ -2,12 +2,13 @@
 
 A high-fidelity research prototype developed for the BSc dissertation
 **"Design and Evaluation of a Structured Cue-to-Prompt Interface for
-Reducing Explanation Burden in the Pre-Prompt Stage of LLM-Based
-Emotional Support"** (University of Leeds, COMP3931, 2026).
+Reducing Perceived Explanation Burden During First-Message Preparation
+in a Hypothetical Emotional-Support Scenario"**
+(University of Leeds, COMP3931, 2025/26).
 
 ## Overview
 
-This prototype supports a within-subject A/B evaluation (N=23)
+This prototype supports a within-subject A/B evaluation (N = 23)
 comparing a blank text-input baseline (Condition A) against a
 structured six-screen Cue-to-Prompt interface (Condition B). The
 interface scaffolds emotional expression through concern selection,
@@ -22,14 +23,15 @@ The prototype is deliberately minimal and self-contained:
 - **Deterministic output.** Identical selections produce byte-identical
   prompts.
 
-See Appendix D of the dissertation for the rationale behind these
-choices.
+See Figure 3 (§5.3) and Appendix E of the dissertation for the
+rationale behind these methodological commitments.
 
 ## Tech stack
 
 - React 19.2 with Hooks
 - Vite 8.0 (dev server + bundler)
-- Tailwind CSS utility classes
+- Tailwind CSS utility classes (loaded at runtime via
+  `@tailwindcss/browser` CDN; see Appendix E.1)
 - `lucide-react` icon set
 
 ## Getting started
@@ -55,7 +57,7 @@ cue-to-prompt/
 │   └── icons.svg
 └── src/
     ├── main.jsx             React root mount
-    ├── App.jsx              Main component (see Appendix D of thesis)
+    ├── App.jsx              Main component (see Appendix E of thesis)
     ├── App.css              Component-specific styles
     ├── index.css            Global base styles
     └── assets/
@@ -75,16 +77,19 @@ across participants.
 
 ## Interaction flow
 
-The interface walks participants through seven screens:
+The interface walks participants through six screen types. The
+cue-collection stage is repeated once for each of the three selected
+concerns. Full screen-by-screen descriptions are in Appendix D of the
+dissertation.
 
-| Step | Screen                    | State updated                    |
-|------|---------------------------|----------------------------------|
-| 0    | Scenario entry            | —                                |
-| 1    | Concern selection (3 of 5)| `selectedConcerns`               |
-| 2–4  | Cue collection (× 3)      | `concernData[concernId]`         |
-| 5    | Support need              | `supportNeeds`, `responseStyle`  |
-| 6    | Optional free text        | `optionalText`                   |
-| 7    | Structured summary + generated prompt | —                    |
+| Step | Screen type                           | State updated                      |
+|------|---------------------------------------|------------------------------------|
+| 1    | Scenario entry                        | —                                  |
+| 2    | Concern selection (3 of 5)            | `selectedConcerns`                 |
+| 3    | Cue collection (repeated × 3)         | `concernData[concernId]`           |
+| 4    | Support need                          | `supportNeeds`, `responseStyle`    |
+| 5    | Optional free text                    | `optionalText`                     |
+| 6    | Structured summary + generated prompt | —                                  |
 
 ## License and access
 
@@ -94,4 +99,4 @@ reproducibility purposes. It is not intended for clinical deployment.
 ## Author
 
 Rui Gu · BSc Computer Science with Artificial Intelligence ·
-University of Leeds · 2026
+University of Leeds · 2025/26
